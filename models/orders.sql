@@ -1,14 +1,25 @@
 {% set payment_methods = ['credit_card', 'coupon', 'bank_transfer', 'gift_card'] %}
+{% set include_missing_models = False %}
 
 with orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select *
+    {% if include_missing_models %}
+    from {{ ref('stg_orders') }}
+    {% else %}
+    from {{ ref('stg_customers') }}
+    {% endif %}
 
 ),
 
 payments as (
 
-    select * from {{ ref('stg_payments') }}
+    select *
+    {% if include_missing_models %}
+    from {{ ref('stg_payments') }}
+    {% else %}
+    from {{ ref('stg_customers') }}
+    {% endif %}
 
 ),
 
@@ -16,11 +27,8 @@ order_payments as (
 
     select
         order_id,
-
-        {% for payment_method in payment_methods -%}
-        sum(case when payment_method = '{{ payment_method }}' then amount else 0 end) as {{ payment_method }}_amount,
-        {% endfor -%}
-
+        sum(case when payment_method = 'credit_card' then amount else 0 end) as credit_card_amount,
+        sum(case when payment_method = 'coupon' then amount else 0 end) as coupon_amount,
         sum(amount) as total_amount
 
     from payments
@@ -37,11 +45,8 @@ final as (
         orders.order_date,
         orders.status,
 
-        {% for payment_method in payment_methods -%}
-
-        order_payments.{{ payment_method }}_amount,
-
-        {% endfor -%}
+        order_payments.credit_card_amount,
+        order_payments.coupon_amount,
 
         order_payments.total_amount as amount
 
