@@ -1,21 +1,21 @@
 {% set payment_methods = ['credit_card', 'coupon', 'bank_transfer', 'gift_card'] %}
-{% set include_missing_models = False %}
 
 with orders as (
 
     select *
-    {% if include_missing_models %}
+    {% if var('include_missing_models', false) %}
     from {{ ref('stg_orders') }}
     {% else %}
     from {{ ref('stg_customers') }}
     {% endif %}
+
 
 ),
 
 payments as (
 
     select *
-    {% if include_missing_models %}
+    {% if var('include_missing_models', false) %}
     from {{ ref('stg_payments') }}
     {% else %}
     from {{ ref('stg_customers') }}
