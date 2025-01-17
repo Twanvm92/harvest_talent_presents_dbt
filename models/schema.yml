@@ -6,7 +6,8 @@ models:
 
     columns:
       - name: customer_id
-        description: This is a unique identifier for a customer
+        description: This is an identifier for a customer
+
 
       - name: first_name
         description: Customer's first name. PII.
@@ -31,7 +32,7 @@ models:
 
     columns:
       - name: order_id
-        description: This is a unique identifier for an order
+        description: This is an identifier for an order
 
       - name: customer_id
         description: Foreign key to the customers table
